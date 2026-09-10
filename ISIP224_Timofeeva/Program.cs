@@ -93,7 +93,6 @@ namespace _3ISIP_224_Timofeeva
                 else if (n == 0) return;
                 else Console.WriteLine("Неизвестная функция");
 
-
             }
         }
     }
