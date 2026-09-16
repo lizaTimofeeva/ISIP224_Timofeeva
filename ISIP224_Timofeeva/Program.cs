@@ -6,94 +6,225 @@ using System.Threading.Tasks;
 
 namespace _3ISIP_224_Timofeeva
 {
+    enum Category
+    {
+        Food = 1,
+        ForHome = 2,
+        Alcohol = 3,
+        Other = 4
+    }
+
+    class Product
+    {
+        public int ID;
+        public string Name;
+        public int Cost;
+        public int Count;
+        public Category Cat;
+
+        
+        public Product(int id, string name, int cost, int count, Category cat)
+        {
+            ID = id;
+            Name = name;
+            Cost = cost;
+            Count = count;
+            Cat = cat;
+        }
+    }
+
     internal class Program
     {
         static void Main(string[] args)
         {
-            int count = 0;
-            while (count < 2 || count > 40)
-            {
-                Console.WriteLine("Сколько трат внести (от 2 до 40)? ");
-                count = Convert.ToInt32(Console.ReadLine());
-            }
 
-            string[] names = new string[count];
-            int[] prices = new int[count];
 
-            Console.WriteLine("\nВводите траты по шаблону (Название; Сумма)\n");
-            for (int i = 0; i < count; i++)
-            {
-                Console.Write("Операция " + (i + 1) + ": ");
-                string[] parts = Console.ReadLine().Replace("(", "").Replace(")", "").Split(';');
-                names[i] = parts[0].Trim();
-                prices[i] = Convert.ToInt32(parts[1].Trim());
-            }
+            List<Product> products = new List<Product>();
+            int nextID = 1; 
+
+            
+            products.Add(new Product(nextID, "Хлеб", 45, 20, Category.Food));
+            nextID++;
+            products.Add(new Product(nextID, "Молоко", 90, 15, Category.Food));
+            nextID++;
+            products.Add(new Product(nextID, "Влажные салфетки", 235, 8, Category.ForHome));
+            nextID++;
+            products.Add(new Product(nextID, "Вино красное", 700, 5, Category.Alcohol));
+            nextID++;
+            products.Add(new Product(nextID, "Батарейки AA", 320, 0, Category.Other));
+            nextID++;
+
             while (true)
             {
-                Console.WriteLine("\n 1. Вывод данных \n 2. Статистика \n 3. Сортировка по цене \n 4. Конвертация валюты \n 5. Поиск по названию \n 0. Выход \n");
+                Console.WriteLine("Выберите пункт: ");
+                Console.WriteLine("\n 1. Показать все товары \n 2. Добавить товар \n 3. Удалить товар \n 4. Заказать поставку \n 5. Продать товар \n 6. Поиск товара \n 0. Выход \n");
                 int n = Convert.ToInt32(Console.ReadLine());
                 Console.Clear();
 
+                if (n == 0) return;
+
+                
                 if (n == 1)
                 {
-                    for (int i = 0; i < count; i++)
-                        Console.WriteLine(names[i] + " - " + prices[i] + " руб.");
+                    if (products.Count == 0)
+                        Console.WriteLine("Список товаров пуст");
+
+                    for (int i = 0; i < products.Count; i++)
+                        Print(products[i]);
                 }
+
                 else if (n == 2)
                 {
-                    int sum = 0, max = prices[0], min = prices[0];
-                    for (int i = 0; i < count; i++)
+                    string name = "";
+                    while (name == "")
                     {
-                        sum += prices[i];
-                        if (prices[i] > max) max = prices[i];
-                        if (prices[i] < min) min = prices[i];
+                        Console.Write("Название: ");
+                        name = Console.ReadLine().Trim();
+                        if (name == "")
+                            Console.WriteLine("Название не может быть пустым");
                     }
-                    Console.WriteLine("Сумма: " + sum + " руб.");
-                    Console.WriteLine("Среднее: " + Math.Round((double)sum / count, 2) + " руб.");
-                    Console.WriteLine("Максимум: " + max + " руб.");
-                    Console.WriteLine("Минимум: " + min + " руб.");
-                }
-                else if (n == 3)
-                {
-                    for (int i = 0; i < count - 1; i++)
-                        for (int j = 0; j < count - 1 - i; j++)
-                            if (prices[j] > prices[j + 1])
-                            {
-                                int t = prices[j]; prices[j] = prices[j + 1]; prices[j + 1] = t;
-                                string s = names[j]; names[j] = names[j + 1]; names[j + 1] = s;
-                            }
-
-                    for (int i = 0; i < count; i++)
-                        Console.WriteLine(names[i] + " - " + prices[i] + " руб.");
-                }
-                else if (n == 4)
-                {
-                    Console.WriteLine(" 1. Доллар (90) \n 2. Евро (100) \n 3. Юань (12) \n");
+                    Console.WriteLine("Введите цену: ");
+                    int cost = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Введите количество штук: ");
+                    int count = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Категория: ");
+                    Console.WriteLine("\n 1. Продукты \n 2. Для дома \n 3. Алкоголь \n 4. Другое \n");
                     int c = Convert.ToInt32(Console.ReadLine());
 
-                    double rate = 0;
-                    string valuta = "";
-                    if (c == 1) { rate = 90; valuta = "$"; }
-                    else if (c == 2) { rate = 100; valuta = "€"; }
-                    else if (c == 3) { rate = 12; valuta = "¥"; }
-                    else { Console.WriteLine("Неизвестная валюта"); continue; }
+                    Category cat = Category.Other;
+                    if (c == 1) cat = Category.Food;
+                    else if (c == 2) cat = Category.ForHome;
+                    else if (c == 3) cat = Category.Alcohol;
 
-                    for (int i = 0; i < count; i++)
-                        Console.WriteLine(names[i] + " - " + Math.Round(prices[i] / rate, 2) + " " + valuta);
+                    products.Add(new Product(nextID, name, cost, count, cat));
+                    Console.WriteLine("\nТовар добавлен, его код: " + nextID);
+                    nextID++;
                 }
+
+                
+                else if (n == 3)
+                {
+                    for (int i = 0; i < products.Count; i++)
+                        Print(products[i]);
+
+                    Console.WriteLine("Введите код товара: ");
+                    int id = Convert.ToInt32(Console.ReadLine());
+
+                    int index = -1; 
+                    for (int i = 0; i < products.Count; i++)
+                        if (products[i].ID == id)
+                            index = i;
+
+                    if (index == -1)
+                        Console.WriteLine("Товара с таким кодом нет");
+                    else
+                    {
+                        Console.WriteLine("Товар \"" + products[index].Name + "\" удалён");
+                        products.RemoveAt(index);
+                    }
+                }
+
+                
+                else if (n == 4)
+                {
+                    for (int i = 0; i < products.Count; i++)
+                        Print(products[i]);
+
+                    Console.WriteLine("Введите код товара: ");
+                    int id = Convert.ToInt32(Console.ReadLine());
+
+                    int index = -1;
+                    for (int i = 0; i < products.Count; i++)
+                        if (products[i].ID == id)
+                            index = i;
+
+                    if (index == -1)
+                        Console.WriteLine("Товара с таким кодом нет");
+                    else
+                    {
+                        Console.WriteLine("Сколько штук привезли:  ");
+                        int count = Convert.ToInt32(Console.ReadLine());
+                        products[index].Count = products[index].Count + count;
+                        Console.WriteLine("Поставка принята, на складе стало " + products[index].Count + " шт.");
+                    }
+                }
+
+                
                 else if (n == 5)
                 {
-                    Console.WriteLine("Введите название: ");
-                    string q = Console.ReadLine().ToLower();
+                    for (int i = 0; i < products.Count; i++)
+                        Print(products[i]);
 
-                    for (int i = 0; i < count; i++)
-                        if (names[i].ToLower().Contains(q))
-                            Console.WriteLine(names[i] + " - " + prices[i] + " руб.");
+                    Console.WriteLine("Введите код товара: ");
+                    int id = Convert.ToInt32(Console.ReadLine());
+
+                    int index = -1;
+                    for (int i = 0; i < products.Count; i++)
+                        if (products[i].ID == id)
+                            index = i;
+
+                    if (index == -1)
+                        Console.WriteLine("Товара с таким кодом нет");
+                    else if (products[index].Count == 0)
+                        Console.WriteLine("Товара \"" + products[index].Name + "\" нет на складе");
+                    else
+                    {
+                        Console.WriteLine("Сколько штук продаем: ");
+                        int count = Convert.ToInt32(Console.ReadLine());
+                        
+                        if (count > products[index].Count)
+                            Console.WriteLine("На складе только " + products[index].Count + " шт., продажа отменена");
+                        else
+                        {
+                            products[index].Count = products[index].Count - count;
+                            Console.WriteLine("Продано " + count + " шт. на сумму " + count * products[index].Cost + " руб.");
+                            Console.WriteLine("Осталось на складе: " + products[index].Count + " шт.");
+                        }
+                    }
                 }
-                else if (n == 0) return;
-                else Console.WriteLine("Неизвестная функция");
 
+                
+                
+                else if (n == 6)
+                {
+                    string q = "";
+                    while (q == "")
+                    {
+                        Console.Write("Название или часть названия: ");
+                        q = Console.ReadLine().Trim().ToLower();
+                    }
+
+                    Console.WriteLine();
+                    bool found = false;
+
+                    for (int i = 0; i < products.Count; i++)
+                        if (products[i].Name.ToLower().Contains(q))
+                        {
+                            Print(products[i]);
+                            found = true;
+                        }
+
+                    if (found == false)
+                        Console.WriteLine("Ничего не найдено");
+                }
             }
         }
+
+       
+        static void Print(Product p)
+        {
+            string sklad = "нет";
+            if (p.Count > 0) sklad = "да";
+
+            string cat = "Другое";
+            if (p.Cat == Category.Food) cat = "Продукты";
+            else if (p.Cat == Category.ForHome) cat = "Для дома";
+            else if (p.Cat == Category.Alcohol) cat = "Алкоголь";
+
+            Console.WriteLine("Код: " + p.ID + " | " + p.Name + " | " + p.Cost + " руб. | "
+                + p.Count + " шт. | категория: " + cat + " | на складе: " + sklad);
+        }
+
+        
     }
 }
